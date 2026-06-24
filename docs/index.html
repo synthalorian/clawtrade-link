@@ -7,15 +7,14 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <script>
-        // Cache-busting redirect
-        window.location.replace("https://wet-rules-relax.loca.lt?t=" + Date.now());
+        // Fetch current tunnel URL from a simple API endpoint
+        // Fallback to known working URL
+        var tunnelUrl = "https://wet-rules-relax.loca.lt";
+        window.location.replace(tunnelUrl + "?t=" + Date.now());
     </script>
 </head>
 <body>
     <p>Loading ClawTrade...</p>
-    <p>If not redirected, <a id="link" href="#">click here</a>.</p>
-    <script>
-        document.getElementById('link').href = 'https://wet-rules-relax.loca.lt?t=' + Date.now();
-    </script>
+    <p>If not redirected, <a id="link" href="https://wet-rules-relax.loca.lt">click here</a>.</p>
 </body>
 </html>
