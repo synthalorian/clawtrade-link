@@ -17,38 +17,72 @@
             justify-content: center; 
             height: 100vh; 
             margin: 0;
+            text-align: center;
         }
-        .loading { font-size: 1.5em; }
-        .error { color: #ff0040; display: none; }
-        a { color: #00f0ff; }
+        .loading { font-size: 1.5em; margin-bottom: 20px; }
+        .error { color: #ff0040; display: none; margin: 20px; }
+        .backup { display: none; margin: 20px; }
+        a { color: #00f0ff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .status { font-size: 0.8em; color: #666; margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="loading">Connecting to ClawTrade...</div>
-    <div class="error" id="error">
-        <p>Tunnel unavailable. <a id="direct-link" href="#">Try direct link</a></p>
+    
+    <div class="error" id="primary-error">
+        <p>Primary tunnel unavailable.</p>
     </div>
+    
+    <div class="backup" id="backup-section">
+        <p><a id="backup-link" href="#">Try backup tunnel</a></p>
+    </div>
+    
+    <div class="status" id="status"></div>
 
     <script>
-        // Fetch current tunnel URL with cache-busting
-        fetch('tunnel.json?t=' + Date.now(), {
-            cache: 'no-store',
-            headers: { 'Cache-Control': 'no-cache' }
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.url) {
-                window.location.replace(data.url + '?t=' + Date.now());
-            } else {
-                throw new Error('No URL in response');
+        async function tryTunnel(url, name) {
+            document.getElementById('status').textContent = 'Trying ' + name + '...';
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 8000);
+                
+                const response = await fetch(url + '/health?t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'no-cors',
+                    signal: controller.signal,
+                    cache: 'no-store'
+                });
+                
+                clearTimeout(timeout);
+                
+                // If we got here without error, tunnel is likely up
+                window.location.replace(url + '?t=' + Date.now());
+                return true;
+            } catch (e) {
+                console.log(name + ' failed:', e);
+                return false;
             }
-        })
-        .catch(err => {
-            console.error('Failed to fetch tunnel URL:', err);
-            document.querySelector('.loading').style.display = 'none';
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('direct-link').href = 'https://wet-rules-relax.loca.lt';
-        });
+        }
+
+        async function main() {
+            // Try primary tunnel first
+            const primary = await tryTunnel('https://wet-rules-relax.loca.lt', 'primary');
+            if (primary) return;
+            
+            document.getElementById('primary-error').style.display = 'block';
+            
+            // Try backup tunnel
+            const backup = await tryTunnel('https://young-ads-repeat.loca.lt', 'backup');
+            if (backup) return;
+            
+            // Both failed - show manual links
+            document.getElementById('status').textContent = 'Both tunnels unavailable. Try direct links:';
+            document.getElementById('backup-section').style.display = 'block';
+            document.getElementById('backup-link').href = 'https://young-ads-repeat.loca.lt';
+        }
+
+        main();
     </script>
 </body>
 </html>
