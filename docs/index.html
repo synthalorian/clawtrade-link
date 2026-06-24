@@ -41,6 +41,9 @@
     <div class="status" id="status"></div>
 
     <script>
+        const PRIMARY_URL = 'https://wet-rules-relax.loca.lt';
+        const BACKUP_URL = 'https://young-ads-repeat.loca.lt';
+
         async function tryTunnel(url, name) {
             document.getElementById('status').textContent = 'Trying ' + name + '...';
             try {
@@ -67,19 +70,19 @@
 
         async function main() {
             // Try primary tunnel first
-            const primary = await tryTunnel('https://wet-rules-relax.loca.lt', 'primary');
+            const primary = await tryTunnel(PRIMARY_URL, 'primary');
             if (primary) return;
             
             document.getElementById('primary-error').style.display = 'block';
             
             // Try backup tunnel
-            const backup = await tryTunnel('https://young-ads-repeat.loca.lt', 'backup');
+            const backup = await tryTunnel(BACKUP_URL, 'backup');
             if (backup) return;
             
             // Both failed - show manual links
             document.getElementById('status').textContent = 'Both tunnels unavailable. Try direct links:';
             document.getElementById('backup-section').style.display = 'block';
-            document.getElementById('backup-link').href = 'https://young-ads-repeat.loca.lt';
+            document.getElementById('backup-link').href = BACKUP_URL;
         }
 
         main();
