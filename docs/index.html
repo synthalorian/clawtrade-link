@@ -6,15 +6,49 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <script>
-        // Fetch current tunnel URL from a simple API endpoint
-        // Fallback to known working URL
-        var tunnelUrl = "https://wet-rules-relax.loca.lt";
-        window.location.replace(tunnelUrl + "?t=" + Date.now());
-    </script>
+    <style>
+        body { 
+            background: #0a0a0f; 
+            color: #00f0ff; 
+            font-family: 'JetBrains Mono', monospace;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0;
+        }
+        .loading { font-size: 1.5em; }
+        .error { color: #ff0040; display: none; }
+        a { color: #00f0ff; }
+    </style>
 </head>
 <body>
-    <p>Loading ClawTrade...</p>
-    <p>If not redirected, <a id="link" href="https://wet-rules-relax.loca.lt">click here</a>.</p>
+    <div class="loading">Connecting to ClawTrade...</div>
+    <div class="error" id="error">
+        <p>Tunnel unavailable. <a id="direct-link" href="#">Try direct link</a></p>
+    </div>
+
+    <script>
+        // Fetch current tunnel URL with cache-busting
+        fetch('tunnel.json?t=' + Date.now(), {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.url) {
+                window.location.replace(data.url + '?t=' + Date.now());
+            } else {
+                throw new Error('No URL in response');
+            }
+        })
+        .catch(err => {
+            console.error('Failed to fetch tunnel URL:', err);
+            document.querySelector('.loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('direct-link').href = 'https://wet-rules-relax.loca.lt';
+        });
+    </script>
 </body>
 </html>
