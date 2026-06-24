@@ -20,72 +20,28 @@
             text-align: center;
         }
         .loading { font-size: 1.5em; margin-bottom: 20px; }
-        .error { color: #ff0040; display: none; margin: 20px; }
-        .backup { display: none; margin: 20px; }
-        a { color: #00f0ff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        .links { margin: 20px; }
+        a { 
+            color: #00f0ff; 
+            text-decoration: none; 
+            display: block;
+            margin: 10px;
+            padding: 15px 30px;
+            border: 1px solid #00f0ff;
+            border-radius: 4px;
+        }
+        a:hover { background: rgba(0, 240, 255, 0.1); }
         .status { font-size: 0.8em; color: #666; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="loading">Connecting to ClawTrade...</div>
+    <div class="loading">ClawTrade Live Demo</div>
     
-    <div class="error" id="primary-error">
-        <p>Primary tunnel unavailable.</p>
+    <div class="links">
+        <a href="https://wet-rules-relax.loca.lt">🚀 Primary Tunnel</a>
+        <a href="https://young-ads-repeat.loca.lt">🔌 Backup Tunnel</a>
     </div>
     
-    <div class="backup" id="backup-section">
-        <p><a id="backup-link" href="#">Try backup tunnel</a></p>
-    </div>
-    
-    <div class="status" id="status"></div>
-
-    <script>
-        const PRIMARY_URL = 'https://wet-rules-relax.loca.lt';
-        const BACKUP_URL = 'https://young-ads-repeat.loca.lt';
-
-        async function tryTunnel(url, name) {
-            document.getElementById('status').textContent = 'Trying ' + name + '...';
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 8000);
-                
-                const response = await fetch(url + '/health?t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'no-cors',
-                    signal: controller.signal,
-                    cache: 'no-store'
-                });
-                
-                clearTimeout(timeout);
-                
-                // If we got here without error, tunnel is likely up
-                window.location.replace(url + '?t=' + Date.now());
-                return true;
-            } catch (e) {
-                console.log(name + ' failed:', e);
-                return false;
-            }
-        }
-
-        async function main() {
-            // Try primary tunnel first
-            const primary = await tryTunnel(PRIMARY_URL, 'primary');
-            if (primary) return;
-            
-            document.getElementById('primary-error').style.display = 'block';
-            
-            // Try backup tunnel
-            const backup = await tryTunnel(BACKUP_URL, 'backup');
-            if (backup) return;
-            
-            // Both failed - show manual links
-            document.getElementById('status').textContent = 'Both tunnels unavailable. Try direct links:';
-            document.getElementById('backup-section').style.display = 'block';
-            document.getElementById('backup-link').href = BACKUP_URL;
-        }
-
-        main();
-    </script>
+    <div class="status">If one link doesn't work, try the other.</div>
 </body>
 </html>
